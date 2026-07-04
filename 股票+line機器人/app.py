@@ -56,15 +56,20 @@ with col1:
     st.write(f"📈 **固定股數**：{shares1} 股")
     st.write(f"💵 **固定買入價格(美金)**：${buy_price_usd1:.4f}")
 
+    # 計算邏輯
     buy_price_twd1 = buy_price_usd1 * rate
     cost_twd1 = buy_price_twd1 * shares1
-    sell_price_twd1 = sell_price_usd * rate
-    revenue_twd1 = sell_price_twd1 * shares1
-    profit_twd1 = revenue_twd1 - cost_twd1
+    sell_price_twd1 = sell_price_usd * rate        # 一股賣出價格 (台幣)
+    revenue_twd1 = sell_price_twd1 * shares1      # 總收益 (台幣)
+    profit_twd1 = revenue_twd1 - cost_twd1         # 總利潤 (台幣)
+    profit_percent1 = (profit_twd1 / cost_twd1) * 100 if cost_twd1 > 0 else 0.0 # 利潤%數
 
     st.markdown("##### 📋 計算結果")
-    st.text(f"成本(台幣): {cost_twd1:.2f}")
-    st.text(f"總利潤: {profit_twd1:.2f}")
+    st.text(f"成本(台幣): {cost_twd1:,.2f}")
+    st.text(f"一股賣出價格(台幣): {sell_price_twd1:,.2f}")
+    st.text(f"總收益(台幣): {revenue_twd1:,.2f}")
+    st.text(f"總利潤(台幣): {profit_twd1:,.2f}")
+    st.text(f"利潤%數: {profit_percent1:.2f}%")
 
 # --- 第二筆交易 ---
 with col2:
@@ -74,15 +79,20 @@ with col2:
     st.write(f"📈 **固定股數**：{shares2} 股")
     st.write(f"💵 **固定買入價格(美金)**：${buy_price_usd2:.4f}")
 
+    # 計算邏輯
     buy_price_twd2 = buy_price_usd2 * rate
     cost_twd2 = buy_price_twd2 * shares2
-    sell_price_twd2 = sell_price_usd * rate
-    revenue_twd2 = sell_price_twd2 * shares2
-    profit_twd2 = revenue_twd2 - cost_twd2
+    sell_price_twd2 = sell_price_usd * rate        # 一股賣出價格 (台幣)
+    revenue_twd2 = sell_price_twd2 * shares2      # 總收益 (台幣)
+    profit_twd2 = revenue_twd2 - cost_twd2         # 總利潤 (台幣)
+    profit_percent2 = (profit_twd2 / cost_twd2) * 100 if cost_twd2 > 0 else 0.0 # 利潤%數
 
     st.markdown("##### 📋 計算結果")
-    st.text(f"成本(台幣): {cost_twd2:.2f}")
-    st.text(f"總利潤: {profit_twd2:.2f}")
+    st.text(f"成本(台幣): {cost_twd2:,.2f}")
+    st.text(f"一股賣出價格(台幣): {sell_price_twd2:,.2f}")
+    st.text(f"總收益(台幣): {revenue_twd2:,.2f}")
+    st.text(f"總利潤(台幣): {profit_twd2:,.2f}")
+    st.text(f"利潤%數: {profit_percent2:.2f}%")
 
 # --- 總計結果 ---
 with col3:
@@ -90,8 +100,11 @@ with col3:
     st.markdown("---")
 
     total_cost = cost_twd1 + cost_twd2
+    total_revenue = revenue_twd1 + revenue_twd2
     total_profit = profit_twd1 + profit_twd2
+    total_profit_percent = (total_profit / total_cost) * 100 if total_cost > 0 else 0.0
 
     st.metric(label="💰 總成本 (台幣)", value=f"${total_cost:,.0f}")
     st.metric(label="📈 總利潤 (台幣)", value=f"${total_profit:,.0f}")
+    st.metric(label="📊 總報酬率", value=f"{total_profit_percent:.2f}%")
     st.markdown("---")
