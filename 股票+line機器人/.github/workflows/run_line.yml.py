@@ -2,8 +2,8 @@ name: Scheduled LINE Notification
 
 on:
   schedule:
-    - cron: '0 0,14 * * *'    # 這是國際標準時間，換算下來就是台灣時間早上 8 點與晚上 10 點
-  workflow_dispatch:          # 👈 這次我們直接把手動執行的按鈕寫進去！
+    - cron: '0 0,14 * * *'    # 台灣時間早上 8 點與晚上 10 點
+  workflow_dispatch:          # 手動執行開關
 
 jobs:
   run-line-script:
@@ -13,5 +13,16 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/checkout@v3
-        # 這裡會自動去跑你資料夾裡的 app.py 或你的發送腳本
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests yfinance
+
+      - name: Run script
+        env:
+          LINE_NOTIFY_TOKEN: ${{ secrets.LINE_NOTIFY_TOKEN }} # 如果你有設定環境變數的話
+        run: python 股票+line機器人/send_line.py  # 👈 這裡請對準你要定時執行的那個 Python 檔案路徑
