@@ -58,6 +58,16 @@ if __name__ == "__main__":
     total_cost = cost_twd1 + cost_twd2
     total_profit = profit_twd1 + profit_twd2
 
+    # 💡 新增：計算總利潤 % 數 (總報酬率)
+    # 使用 if else 防止總成本為 0 導致程式出錯
+    if total_cost > 0:
+        profit_percentage = (total_profit / total_cost) * 100
+    else:
+        profit_percentage = 0.0
+
+    # 💡 新增：根據正負號決定顯示 + 或 -
+    sign = "+" if profit_percentage >= 0 else ""
+
     # 組合定時通知的訊息
     message_text = (
         f"⏰ 每日定時美股損益報告\n"
@@ -66,7 +76,8 @@ if __name__ == "__main__":
         f"🚀 AMAT 目前股價: ${sell_price_usd:.2f}\n"
         f"----------------------\n"
         f"💰 總成本: NT$ {total_cost:,.0f}\n"
-        f"📈 總利潤: NT$ {total_profit:,.0f}"
+        f"📈 總利潤: NT$ {total_profit:,.0f}\n"
+        f"📊 總報酬率: {sign}{profit_percentage:.2f}%"  # 👈 這行是新加的！
     )
 
     # 執行群發
