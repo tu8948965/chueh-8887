@@ -3,6 +3,7 @@ name: Run Line Bot
 on:
   repository_dispatch:
     types: [wake_up_bot]
+  workflow_dispatch:  # 👈 加上這行！
 
 jobs:
   run_bot:
