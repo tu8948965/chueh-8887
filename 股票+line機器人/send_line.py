@@ -1,3 +1,5 @@
+from datetime import datetime
+import pytz
 import requests
 import yfinance as yf
 
@@ -21,6 +23,41 @@ def get_market_data():
     except:
         pass
     return rate, price
+
+
+def get_next_notification_time():
+    tw_tz = pytz.timezone("Asia/Taipei")
+    now = datetime.now(tw_tz)
+    weekday = now.weekday()  # 0: 週一, 1: 週二, ..., 4: 週五, 5: 週六, 6: 週日
+    hour = now.hour
+
+    if weekday == 0:  # 週一
+        if hour < 22:
+            return "今日 22:00 (美股開盤)"
+        else:
+            return "明日 08:00 (美股收盤)"
+    elif weekday in [1, 2, 3]:  # 週二至週四
+        if hour < 8:
+            return "今日 08:00 (美股收盤)"
+        elif hour < 15:
+            return "今日 15:00 (台股收盤)"
+        elif hour < 22:
+            return "今日 22:00 (美股開盤)"
+        else:
+            return "明日 08:00 (美股收盤)"
+    elif weekday == 4:  # 週五
+        if hour < 8:
+            return "今日 08:00 (美股收盤)"
+        elif hour < 15:
+            return "今日 15:00 (台股收盤)"
+        elif hour < 22:
+            return "今日 22:00 (美股開盤)"
+        else:
+            return "下週一 22:00 (美股開盤)"
+    elif weekday == 5:  # 週六
+        return "下週一 22:00 (美股開盤)"
+    elif weekday == 6:  # 週日
+        return "明日 22:00 (美股開盤)"
 
 
 def send_line_broadcast(token, message):
@@ -76,6 +113,7 @@ if __name__ == "__main__":
         profit_percentage = 0.0
 
     sign = "+" if profit_percentage >= 0 else ""
+    next_time_str = get_next_notification_time()
 
     # 組合定時通知的訊息
     message_text = (
@@ -86,7 +124,9 @@ if __name__ == "__main__":
         f"----------------------\n"
         f"💰 總成本: NT$ {total_cost:,.0f}\n"
         f"📈 總利潤: NT$ {total_profit:,.0f}\n"
-        f"📊 總報酬率: {sign}{profit_percentage:.2f}%"
+        f"📊 總報酬率: {sign}{profit_percentage:.2f}%\n"
+        f"----------------------\n"
+        f"📅 下次通知時間: {next_time_str}"
     )
 
     # 執行群發
