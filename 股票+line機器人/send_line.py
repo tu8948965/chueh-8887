@@ -2,7 +2,7 @@ import requests
 import yfinance as yf
 
 # =========================================================================
-# ⚠️ 只要填 Token 即可！不用填寫任何人的 User ID！
+# LINE Access Token 密鑰
 # =========================================================================
 LINE_ACCESS_TOKEN = "ojd1fCfhL7l+0bYBreZ9ejjwCE5ARqIfYtfMylqKL1hnmXinQGW7OxWmbFxQ6Q4kvADoz4Kyo3C6/QuM5OTEwNvogNRLRF0MVEelpaw0U67cQj2Xjn7s/YAeibP3unOjoVik93vi+rrG+47vem8KqwdB04t89/1O/w1cDnyilFU="
 
@@ -25,7 +25,6 @@ def get_market_data():
 
 def send_line_broadcast(token, message):
     try:
-        # 💡 改用 broadcast 網址，會發給所有加好友的人
         url = "https://api.line.me/v2/bot/message/broadcast"
         headers = {
             "Content-Type": "application/json",
@@ -46,26 +45,36 @@ def send_line_broadcast(token, message):
 if __name__ == "__main__":
     rate, sell_price_usd = get_market_data()
 
-    # 計算固定成本與利潤
-    shares1, buy_price_usd1 = 34, 129.3105
-    cost_twd1 = buy_price_usd1 * rate * shares1
-    profit_twd1 = (sell_price_usd * rate * shares1) - cost_twd1
+    # =========================================================================
+    # 📝 持股成本設定區
+    # 格式：{"shares": 股數, "price": 買入單價美金}
+    # =========================================================================
+    trades = [
+        {"shares": 34, "price": 129.3105},  # 第 1 筆買進
+        {"shares": 32, "price": 133.9345},  # 第 2 筆買進
+        {"shares": 14, "price": 316.3500},  # 第 3 筆買進（新增加）
+    ]
 
-    shares2, buy_price_usd2 = 32, 133.9345
-    cost_twd2 = buy_price_usd2 * rate * shares2
-    profit_twd2 = (sell_price_usd * rate * shares2) - cost_twd2
+    total_cost = 0.0
+    total_profit = 0.0
 
-    total_cost = cost_twd1 + cost_twd2
-    total_profit = profit_twd1 + profit_twd2
+    # 自動迴圈計算所有買入批次的成本與利潤
+    for trade in trades:
+        shares = trade["shares"]
+        buy_price = trade["price"]
 
-    # 💡 新增：計算總利潤 % 數 (總報酬率)
-    # 使用 if else 防止總成本為 0 導致程式出錯
+        cost_twd = buy_price * rate * shares
+        profit_twd = (sell_price_usd * rate * shares) - cost_twd
+
+        total_cost += cost_twd
+        total_profit += profit_twd
+
+    # 計算總報酬率 (% 數)
     if total_cost > 0:
         profit_percentage = (total_profit / total_cost) * 100
     else:
         profit_percentage = 0.0
 
-    # 💡 新增：根據正負號決定顯示 + 或 -
     sign = "+" if profit_percentage >= 0 else ""
 
     # 組合定時通知的訊息
@@ -77,7 +86,7 @@ if __name__ == "__main__":
         f"----------------------\n"
         f"💰 總成本: NT$ {total_cost:,.0f}\n"
         f"📈 總利潤: NT$ {total_profit:,.0f}\n"
-        f"📊 總報酬率: {sign}{profit_percentage:.2f}%"  # 👈 這行是新加的！
+        f"📊 總報酬率: {sign}{profit_percentage:.2f}%"
     )
 
     # 執行群發
